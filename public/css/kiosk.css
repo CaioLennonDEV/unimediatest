@@ -1,17 +1,10 @@
 /* ==========================================================================
-   Estilos Modo Kiosk / Totem Tablet - Bloub AI
+   Modo Totem / Kiosk Tablet — Apenas os Olhos do Avatar Bloub
    ========================================================================== */
 
-:root {
-  --bg-primary: #07080d;
-  --bg-panel: rgba(17, 19, 28, 0.78);
-  --accent-idle: #818cf8;
-  --accent-listening: #10b981;
-  --accent-thinking: #c084fc;
-  --accent-speaking: #38bdf8;
-}
-
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -19,248 +12,128 @@
 
 html,
 body {
-  margin: 0;
-  padding: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-primary);
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  color: #f8fafc;
+  background-color: #000000;
+  color: #ffffff;
   overscroll-behavior: none;
   touch-action: manipulation;
+  cursor: pointer;
 }
 
-/* Permitir seleção apenas nas mensagens de texto caso necessário */
-.selectable-text {
-  user-select: text;
-}
-
-/* Fundo com atmosfera luminosa dinâmica de acordo com o estado do avatar */
-.kiosk-backdrop {
+.kiosk-body {
   position: fixed;
   inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 34%, rgba(99, 102, 241, 0.16) 0%, rgba(14, 165, 233, 0.05) 38%, transparent 70%),
-    radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 15% 85%, rgba(56, 189, 248, 0.08) 0%, transparent 45%);
-  transition: opacity 0.6s ease, filter 0.6s ease;
-}
-
-/* Container do Avatar Bloub */
-.avatar-stage {
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 280px;
-  height: 280px;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  background-color: #000000;
 }
 
-@media (min-height: 820px) and (min-width: 768px) {
-  .avatar-stage {
-    width: 330px;
-    height: 330px;
+.kiosk-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Palco Central dos Olhos */
+.eyes-stage {
+  position: relative;
+  width: 60vw;
+  max-width: 440px;
+  min-width: 260px;
+  height: 38vh;
+  max-height: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+@media (min-width: 768px) and (min-height: 800px) {
+  .eyes-stage {
+    width: 50vw;
+    max-width: 520px;
+    height: 42vh;
+    max-height: 340px;
   }
 }
 
-/* Halo Luminoso Reativo ao redor do Bloub */
-.avatar-aura {
-  position: absolute;
-  inset: -18px;
-  border-radius: 9999px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(129, 140, 248, 0.12) 45%, transparent 72%);
-  filter: blur(18px);
-  opacity: 0.75;
-  transition: all 0.45s ease;
-  pointer-events: none;
+#bloub-eyes-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.avatar-ring {
-  position: absolute;
-  inset: 6px;
-  border-radius: 9999px;
-  border: 1.5px solid rgba(255, 255, 255, 0.09);
-  pointer-events: none;
-  transition: all 0.4s ease;
+/* ==========================================================================
+   Cores e Efeitos Luminosos dos Olhos por Estado
+   ========================================================================== */
+
+.bloub-eye {
+  transition: fill 0.35s ease, filter 0.35s ease;
+  transform-origin: center;
 }
 
-.avatar-ring-outer {
-  position: absolute;
-  inset: -12px;
-  border-radius: 9999px;
-  border: 1px dashed rgba(255, 255, 255, 0.07);
-  pointer-events: none;
-  transition: all 0.4s ease;
+/* 1. IDLE (Standby / Aguardando "Unimed") */
+.eyes-stage[data-state="idle"] .bloub-eye {
+  fill: #ffffff;
+  filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.55))
+          drop-shadow(0 0 50px rgba(255, 255, 255, 0.25));
 }
 
-/* Estados Visuais no Stage */
-.avatar-stage[data-state="idle"] .avatar-aura {
-  background: radial-gradient(circle, rgba(248, 250, 252, 0.16) 0%, rgba(129, 140, 248, 0.12) 45%, transparent 72%);
-  animation: auraBreathe 4.5s ease-in-out infinite;
-}
-
-.avatar-stage[data-state="listening"] .avatar-aura {
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.34) 0%, rgba(52, 211, 153, 0.14) 50%, transparent 74%);
+/* 2. ATIVO (Ouvindo o usuário após "Unimed" ou toque na tela) */
+.eyes-stage[data-state="listening"] {
   transform: scale(1.08);
 }
 
-.avatar-stage[data-state="listening"] .avatar-ring {
-  border-color: rgba(16, 185, 129, 0.45);
-  box-shadow: 0 0 30px rgba(16, 185, 129, 0.25);
-  animation: pulseRing 1.5s ease-out infinite;
+.eyes-stage[data-state="listening"] .bloub-eye {
+  fill: #05f292;
+  filter: drop-shadow(0 0 35px rgba(5, 242, 146, 0.9))
+          drop-shadow(0 0 70px rgba(5, 242, 146, 0.55));
+  animation: eyeActivePulse 1.2s ease-in-out infinite alternate;
 }
 
-.avatar-stage[data-state="thinking"] .avatar-aura {
-  background: radial-gradient(circle, rgba(192, 132, 252, 0.35) 0%, rgba(129, 140, 248, 0.18) 50%, transparent 74%);
-  animation: auraThinking 1.8s ease-in-out infinite;
+/* 3. RESPONDENDO (Pensando na resposta e falando por áudio) */
+.eyes-stage[data-state="thinking"] .bloub-eye {
+  fill: #818cf8;
+  filter: drop-shadow(0 0 30px rgba(129, 140, 248, 0.85))
+          drop-shadow(0 0 60px rgba(129, 140, 248, 0.5));
+  animation: eyeThinkingPulse 0.9s ease-in-out infinite alternate;
 }
 
-.avatar-stage[data-state="thinking"] .avatar-ring-outer {
-  border-color: rgba(192, 132, 252, 0.4);
-  animation: spinSlow 6s linear infinite;
+.eyes-stage[data-state="speaking"] {
+  transform: scale(1.04);
 }
 
-.avatar-stage[data-state="speaking"] .avatar-aura {
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.36) 0%, rgba(129, 140, 248, 0.2) 52%, transparent 75%);
-  animation: auraSpeaking 0.65s ease-in-out infinite alternate;
+.eyes-stage[data-state="speaking"] .bloub-eye {
+  fill: #00e5ff;
+  filter: drop-shadow(0 0 35px rgba(0, 229, 255, 0.95))
+          drop-shadow(0 0 75px rgba(0, 229, 255, 0.6));
 }
 
-.avatar-stage[data-state="speaking"] .avatar-ring {
-  border-color: rgba(56, 189, 248, 0.45);
-  box-shadow: 0 0 35px rgba(56, 189, 248, 0.25);
-}
-
-/* Sombra e destaque do SVG Bloub */
-#bloub-svg {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  z-index: 2;
-  filter: drop-shadow(0 14px 32px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 22px rgba(255, 255, 255, 0.12));
-  transition: filter 0.35s ease;
-}
-
-.avatar-stage[data-state="speaking"] #bloub-svg {
-  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 28px rgba(56, 189, 248, 0.32));
-}
-
-.avatar-stage[data-state="listening"] #bloub-svg {
-  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 28px rgba(16, 185, 129, 0.32));
-}
-
-.avatar-stage[data-state="thinking"] #bloub-svg {
-  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 28px rgba(192, 132, 252, 0.35));
-}
-
-/* Equalizador de Ondas Sonoras (visível em Speaking e Listening) */
-.soundwave-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  height: 28px;
-  opacity: 0.25;
-  transition: opacity 0.3s ease;
-}
-
-.soundwave-container.active {
-  opacity: 1;
-}
-
-.soundwave-bar {
-  width: 5px;
-  height: 6px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #38bdf8, #818cf8);
-  transition: height 0.12s ease, background 0.3s ease;
-}
-
-.soundwave-container.listening .soundwave-bar {
-  background: linear-gradient(180deg, #34d399, #10b981);
-}
-
-/* Scrollbar elegante para o histórico */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.3);
-  border-radius: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.25);
-  border-radius: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.45);
-}
-
-/* Animações Keyframes */
-@keyframes auraBreathe {
-
-  0%,
-  100% {
-    transform: scale(0.96);
-    opacity: 0.65;
-  }
-
-  50% {
-    transform: scale(1.05);
-    opacity: 0.9;
-  }
-}
-
-@keyframes auraThinking {
-
-  0%,
-  100% {
-    transform: scale(0.95) rotate(0deg);
-    opacity: 0.7;
-  }
-
-  50% {
-    transform: scale(1.08) rotate(180deg);
-    opacity: 1;
-  }
-}
-
-@keyframes auraSpeaking {
+/* Animações Keyframes para os Olhos */
+@keyframes eyeActivePulse {
   0% {
-    transform: scale(0.98);
-    opacity: 0.75;
+    filter: drop-shadow(0 0 25px rgba(5, 242, 146, 0.75))
+            drop-shadow(0 0 50px rgba(5, 242, 146, 0.35));
   }
-
   100% {
-    transform: scale(1.12);
-    opacity: 1;
+    filter: drop-shadow(0 0 45px rgba(5, 242, 146, 1))
+            drop-shadow(0 0 85px rgba(5, 242, 146, 0.7));
   }
 }
 
-@keyframes pulseRing {
+@keyframes eyeThinkingPulse {
   0% {
-    transform: scale(0.96);
-    opacity: 0.9;
+    filter: drop-shadow(0 0 20px rgba(129, 140, 248, 0.65))
+            drop-shadow(0 0 45px rgba(129, 140, 248, 0.35));
   }
-
   100% {
-    transform: scale(1.16);
-    opacity: 0;
-  }
-}
-
-@keyframes spinSlow {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
+    filter: drop-shadow(0 0 40px rgba(129, 140, 248, 0.95))
+            drop-shadow(0 0 75px rgba(129, 140, 248, 0.65));
   }
 }
