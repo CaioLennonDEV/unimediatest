@@ -34,15 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
   let isWaitingResponse = false;
 
   const INITIAL_GREETING =
-  'Olá! Eu sou o Bloub, seu assistente virtual. Diga "Unimed" a qualquer momento para falar comigo, ou use os botões na tela. Como posso ajudar você hoje?';
+    'Olá! Eu sou o Bloub, seu assistente virtual. Diga "Unimed" a qualquer momento para falar comigo, ou use os botões na tela. Como posso ajudar você hoje?';
 
   // 1. Inicializa o controlador do Avatar SVG Bloub com fallback seguro
   const avatar = typeof window.BloubAvatarController === 'function'
     ? new window.BloubAvatarController()
     : {
-        setState: (st) => console.warn('[Avatar fallback] estado:', st),
-        triggerWordPulse: () => {},
-      };
+      setState: (st) => console.warn('[Avatar fallback] estado:', st),
+      triggerWordPulse: () => { },
+    };
 
   // 2. Inicializa o gerenciador de Voz (TTS + STT + Wake Word "Unimed")
   const speech = new window.SpeechManager({
@@ -55,70 +55,70 @@ document.addEventListener('DOMContentLoaded', () => {
       avatar.triggerWordPulse(1.1);
     },
     onSpeakEnd: () => {
-        if (!isWaitingResponse && speech.listenMode !== 'active') {
+      if (!isWaitingResponse && speech.listenMode !== 'active') {
+        avatar.setState('idle');
+        updateStatusBadge('wakeword', 'Diga "Unimed" para falar');
+      }
+    },
+    onWakeWordDetected: ({ immediateCommand }) => {
+      if (!immediateCommand) {
+        avatar.setState('listening');
+        updateStatusBadge('listening', 'Ativado por "Unimed" — Pode falar!');
+        if (currentSpeechText) {
+          currentSpeechText.innerHTML =
+            '<span class="text-emerald-300 font-semibold">Sim! Ouvi você chamar "Unimed". Pode fazer sua pergunta!</span>';
+        }
+      }
+    },
+    onRecognitionStateChange: (mode) => {
+      if (mode === 'active') {
+        avatar.setState('listening');
+        updateStatusBadge('listening', 'Ouvindo sua pergunta...');
+        micBtn.classList.add('ring-4', 'ring-emerald-500/40', 'bg-emerald-500', 'text-slate-950');
+        micBtn.classList.remove('bg-slate-800/90', 'text-emerald-400');
+        if (micBtnLabel) micBtnLabel.textContent = 'Ouvindo...';
+        if (wakewordBadge) {
+          wakewordBadge.classList.replace('border-emerald-500/30', 'border-emerald-400');
+          wakewordBadge.classList.replace('bg-emerald-500/10', 'bg-emerald-500/25');
+        }
+      } else if (mode === 'wakeword') {
+        micBtn.classList.remove('ring-4', 'ring-emerald-500/40', 'bg-emerald-500', 'text-slate-950');
+        micBtn.classList.add('bg-slate-800/90', 'text-emerald-400');
+        if (micBtnLabel) micBtnLabel.textContent = 'Falar';
+        if (wakewordBadge) {
+          wakewordBadge.classList.replace('border-emerald-400', 'border-emerald-500/30');
+          wakewordBadge.classList.replace('bg-emerald-500/25', 'bg-emerald-500/10');
+        }
+        if (!isWaitingResponse && !speech.isSpeaking) {
           avatar.setState('idle');
           updateStatusBadge('wakeword', 'Diga "Unimed" para falar');
         }
-      },
-          onWakeWordDetected: ({ immediateCommand }) => {
-            if (!immediateCommand) {
-              avatar.setState('listening');
-              updateStatusBadge('listening', 'Ativado por "Unimed" — Pode falar!');
-              if (currentSpeechText) {
-                currentSpeechText.innerHTML =
-                  '<span class="text-emerald-300 font-semibold">Sim! Ouvi você chamar "Unimed". Pode fazer sua pergunta!</span>';
-              }
-            }
-          },
-            onRecognitionStateChange: (mode) => {
-              if (mode === 'active') {
-                avatar.setState('listening');
-                updateStatusBadge('listening', 'Ouvindo sua pergunta...');
-                micBtn.classList.add('ring-4', 'ring-emerald-500/40', 'bg-emerald-500', 'text-slate-950');
-                micBtn.classList.remove('bg-slate-800/90', 'text-emerald-400');
-                if (micBtnLabel) micBtnLabel.textContent = 'Ouvindo...';
-                if (wakewordBadge) {
-                  wakewordBadge.classList.replace('border-emerald-500/30', 'border-emerald-400');
-                  wakewordBadge.classList.replace('bg-emerald-500/10', 'bg-emerald-500/25');
-                }
-              } else if (mode === 'wakeword') {
-                micBtn.classList.remove('ring-4', 'ring-emerald-500/40', 'bg-emerald-500', 'text-slate-950');
-                micBtn.classList.add('bg-slate-800/90', 'text-emerald-400');
-                if (micBtnLabel) micBtnLabel.textContent = 'Falar';
-                if (wakewordBadge) {
-                  wakewordBadge.classList.replace('border-emerald-400', 'border-emerald-500/30');
-                  wakewordBadge.classList.replace('bg-emerald-500/25', 'bg-emerald-500/10');
-                }
-                if (!isWaitingResponse && !speech.isSpeaking) {
-                  avatar.setState('idle');
-                  updateStatusBadge('wakeword', 'Diga "Unimed" para falar');
-                }
-              } else {
-                micBtn.classList.remove('ring-4', 'ring-emerald-500/40', 'bg-emerald-500', 'text-slate-950');
-                micBtn.classList.add('bg-slate-800/90', 'text-emerald-400');
-                if (micBtnLabel) micBtnLabel.textContent = 'Falar';
-                  if (!isWaitingResponse && !speech.isSpeaking) {
-                    avatar.setState('idle');
-                    updateStatusBadge('idle', 'Pronto para conversar');
-                  }
-                }
-              },
-              onRecognitionResult: ({ interim, final }) => {
-                if (interim) {
-                  chatInput.value = interim;
-                }
-                if (final) {
-                  chatInput.value = final;
-                  sendMessage(final);
-                }
-              },
-                onRecognitionError: (errorType) => {
-                  if (errorType === 'not-supported') {
-                    showSystemNotice('Reconhecimento de voz não suportado neste navegador. Use o teclado abaixo.');
-                  } else if (errorType === 'not-allowed') {
-                    showSystemNotice('Permissão de microfone negada. Libere o microfone para ativar por voz com "Unimed".');
-                  }
-                },
+      } else {
+        micBtn.classList.remove('ring-4', 'ring-emerald-500/40', 'bg-emerald-500', 'text-slate-950');
+        micBtn.classList.add('bg-slate-800/90', 'text-emerald-400');
+        if (micBtnLabel) micBtnLabel.textContent = 'Falar';
+        if (!isWaitingResponse && !speech.isSpeaking) {
+          avatar.setState('idle');
+          updateStatusBadge('idle', 'Pronto para conversar');
+        }
+      }
+    },
+    onRecognitionResult: ({ interim, final }) => {
+      if (interim) {
+        chatInput.value = interim;
+      }
+      if (final) {
+        chatInput.value = final;
+        sendMessage(final);
+      }
+    },
+    onRecognitionError: (errorType) => {
+      if (errorType === 'not-supported') {
+        showSystemNotice('Reconhecimento de voz não suportado neste navegador. Use o teclado abaixo.');
+      } else if (errorType === 'not-allowed') {
+        showSystemNotice('Permissão de microfone negada. Libere o microfone para ativar por voz com "Unimed".');
+      }
+    },
   });
 
   if (!speech.hasSTTSupport() && micBtn) {
