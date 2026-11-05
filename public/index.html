@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -7,49 +7,36 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#000000" />
-  <title>Bloub — Totem</title>
+  <title>Bloub</title>
 
   <!-- Estilos Kiosk Ultra Minimalistas -->
   <link rel="stylesheet" href="/css/kiosk.css" />
 </head>
 <body class="kiosk-body">
 
-  <!-- Palco Central: Apenas os Olhos do Avatar -->
-  <main id="kiosk-screen" class="kiosk-container" role="button" aria-label="Toque para interagir com o totem">
+  <main id="kiosk-screen" class="kiosk-container" role="button" aria-label="Toque para interagir">
     <div id="avatar-stage" class="eyes-stage" data-state="idle">
       <svg
         id="bloub-eyes-svg"
-        viewBox="-45 -95 150 90"
+        viewBox="-60 -110 180 120"
         role="img"
-        aria-label="Olhos do Avatar Bloub"
+        aria-label="Olhos do Bloub"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <defs>
-          <filter id="eye-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        <g id="eyes-group" filter="url(#eye-glow)">
-          <!-- Olho Esquerdo Original de test.txt -->
-          <path
-            id="bloub-eye-left"
-            class="bloub-eye"
-            d="M-9.3 -11.3A9.3 9.3 0 0 1 0 -20.6L0 -20.6A9.3 9.3 0 0 1 9.3 -11.3L9.3 11.3A9.3 9.3 0 0 1 0 20.6L0 20.6A9.3 9.3 0 0 1 -9.3 11.3Z"
-            transform="matrix(0.89,-0.34,0.43,0.83,11.67,-45.56)"
-          />
-          <!-- Olho Direito Original de test.txt -->
-          <path
-            id="bloub-eye-right"
-            class="bloub-eye"
-            d="M-9.3 -11.3A9.3 9.3 0 0 1 0 -20.6L0 -20.6A9.3 9.3 0 0 1 9.3 -11.3L9.3 11.3A9.3 9.3 0 0 1 0 20.6L0 20.6A9.3 9.3 0 0 1 -9.3 11.3Z"
-            transform="matrix(0.7,-0.06,0.43,0.83,55.89,-56.47)"
-          />
-        </g>
+        <!-- Olho Esquerdo Original de test.txt -->
+        <path
+          id="bloub-eye-left"
+          class="bloub-eye"
+          d="M-9.3 -11.3A9.3 9.3 0 0 1 0 -20.6L0 -20.6A9.3 9.3 0 0 1 9.3 -11.3L9.3 11.3A9.3 9.3 0 0 1 0 20.6L0 20.6A9.3 9.3 0 0 1 -9.3 11.3Z"
+          transform="matrix(0.89,-0.34,0.43,0.83,11.67,-45.56)"
+        />
+        <!-- Olho Direito Original de test.txt -->
+        <path
+          id="bloub-eye-right"
+          class="bloub-eye"
+          d="M-9.3 -11.3A9.3 9.3 0 0 1 0 -20.6L0 -20.6A9.3 9.3 0 0 1 9.3 -11.3L9.3 11.3A9.3 9.3 0 0 1 0 20.6L0 20.6A9.3 9.3 0 0 1 -9.3 11.3Z"
+          transform="matrix(0.7,-0.06,0.43,0.83,55.89,-56.47)"
+        />
       </svg>
     </div>
   </main>
