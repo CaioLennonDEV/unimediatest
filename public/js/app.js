@@ -36,8 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const INITIAL_GREETING =
   'Olá! Eu sou o Bloub, seu assistente virtual. Diga "Unimed" a qualquer momento para falar comigo, ou use os botões na tela. Como posso ajudar você hoje?';
 
-  // 1. Inicializa o controlador do Avatar SVG Bloub
-  const avatar = new window.BloubAvatarController();
+  // 1. Inicializa o controlador do Avatar SVG Bloub com fallback seguro
+  const avatar = typeof window.BloubAvatarController === 'function'
+    ? new window.BloubAvatarController()
+    : {
+        setState: (st) => console.warn('[Avatar fallback] estado:', st),
+        triggerWordPulse: () => {},
+      };
 
   // 2. Inicializa o gerenciador de Voz (TTS + STT + Wake Word "Unimed")
   const speech = new window.SpeechManager({
