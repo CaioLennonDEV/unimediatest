@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#07080d" />
+  <title>Bloub — Assistente Virtual Interativo (Modo Totem)</title>
+
+  <!-- Fonte Moderna Legível à Distância -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Estilos Kiosk e Animações do Avatar -->
+  <link rel="stylesheet" href="/css/kiosk.css" />
+</head>
+
+<body class="relative flex flex-col h-screen w-screen overflow-hidden bg-[#07080d] text-slate-100">
+
+  <!-- Atmosfera Luminosa de Fundo -->
+  <div class="kiosk-backdrop"></div>
+
+  <!-- =======================================================================
+       TELA DE DESBLOQUEIO DE ÁUDIO / INÍCIO DO TOTEM (AUTOPLAY TABLET FIX)
+       ======================================================================= -->
+  <div id="kiosk-start-overlay"
+    class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#07080d]/95 backdrop-blur-xl px-6 text-center transition-opacity duration-400">
+    <div class="relative mb-8 flex items-center justify-center">
+      <div class="absolute -inset-6 rounded-full bg-indigo-500/20 blur-2xl animate-pulse"></div>
+      <!-- Miniatura estática do Bloub na tela de boas-vindas -->
+      <svg width="150" height="150" viewBox="-125 -125 250 250" role="img" aria-label="Bloub preview"
+        xmlns="http://www.w3.org/2000/svg" class="relative z-10 drop-shadow-[0_0_25px_rgba(255,255,255,0.2)]">
+        <defs>
+          <mask id="bot-mask-welcome" maskUnits="userSpaceOnUse" x="-158" y="-158" width="316" height="316">
+            <circle cx="0" cy="0" r="100" fill="#fff" />
+            <path
+              d="M-9.3 -11.3A9.3 9.3 0 0 1 0 -20.6L0 -20.6A9.3 9.3 0 0 1 9.3 -11.3L9.3 11.3A9.3 9.3 0 0 1 0 20.6L0 20.6A9.3 9.3 0 0 1 -9.3 11.3Z"
+              transform="matrix(0.89,-0.34,0.43,0.83,11.67,-45.56)" fill="#000" />
+            <path
+              d="M-9.3 -11.3A9.3 9.3 0 0 1 0 -20.6L0 -20.6A9.3 9.3 0 0 1 9.3 -11.3L9.3 11.3A9.3 9.3 0 0 1 0 20.6L0 20.6A9.3 9.3 0 0 1 -9.3 11.3Z"
+              transform="matrix(0.7,-0.06,0.43,0.83,55.89,-56.47)" fill="#000" />
+          </mask>
+        </defs>
+        <circle cx="1" cy="-1" r="101" fill="#f9f9f9" />
+        <g mask="url(#bot-mask-welcome)">
+          <rect x="-158" y="-158" width="316" height="316" fill="#0a0a0c" />
+        </g>
+      </svg>
+    </div>
+
+    <span
+      class="inline-flex items-center gap-2 rounded-full bg-indigo-500/15 border border-indigo-400/30 px-4 py-1.5 text-xs md:text-sm font-semibold uppercase tracking-widest text-indigo-300 mb-4">
+      Totem Interativo IA
+    </span>
+
+    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white mb-4">
+      Olá, eu sou o <span
+        class="bg-gradient-to-r from-indigo-400 via-sky-300 to-emerald-300 bg-clip-text text-transparent">Bloub</span>!
+    </h1>
+
+    <p class="max-w-md text-base md:text-lg text-slate-300/90 mb-4 leading-relaxed">
+      Toque no botão abaixo para ativar a voz e iniciar seu atendimento por fala ou texto.
+    </p>
+
+    <div
+      class="inline-flex items-center gap-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 px-4 py-2 text-sm text-emerald-300 mb-8">
+      <span>🎙️ Frase de ativação por voz:</span>
+      <strong class="font-extrabold tracking-wide text-emerald-200">"Unimed"</strong>
+    </div>
+
+    <button id="start-kiosk-btn" type="button"
+      class="group relative inline-flex items-center gap-4 rounded-2xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-sky-500 px-9 py-5 text-lg md:text-xl font-bold text-white shadow-[0_0_40px_rgba(99,102,241,0.45)] transition-all duration-200 active:scale-95 hover:brightness-110">
+      <svg class="w-7 h-7 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
+        stroke-width="2.2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+      </svg>
+      <span>Iniciar Interação</span>
+    </button>
+  </div>
+
+  <!-- =======================================================================
+       CABEÇALHO DO KIOSK (STATUS E CONTROLES DE SESSÃO)
+       ======================================================================= -->
+  <header
+    class="relative z-10 flex items-center justify-between px-5 py-3.5 md:px-8 md:py-4 border-b border-white/10 bg-slate-950/60 backdrop-blur-md">
+    <!-- Identidade e Status Atual -->
+    <div class="flex items-center gap-3.5">
+      <div
+        class="flex items-center gap-2.5 rounded-full bg-slate-900/90 border border-slate-700/80 px-4 py-2 shadow-inner">
+        <span id="status-dot" class="w-3 h-3 rounded-full bg-indigo-400"></span>
+        <span id="status-label" class="text-xs md:text-sm font-semibold text-slate-200 tracking-wide">
+          Diga "Unimed" para falar
+        </span>
+      </div>
+      <div
+        id="wakeword-badge"
+        class="hidden md:flex items-center gap-1.5 text-xs text-emerald-300 bg-emerald-500/10 border
+        border-emerald-500/30 px-3.5 py-1.5 rounded-full transition-colors">
+        <span>🎙️ Ativação:</span>
+        <strong class="font-bold text-emerald-200">"Unimed"</strong>
+      </div>
+      <div
+        class="hidden xl:flex items-center gap-1.5 text-xs text-slate-400 bg-slate-900/50 border border-slate-800 px-3 py-1.5 rounded-full">
+        <span>Voz:</span>
+        <span id="voice-name-label" class="font-medium text-slate-300 truncate max-w-[180px]">Português (pt-BR)</span>
+      </div>
+    </div>
+
+    <!-- Botões de Controle Rápido (Mute, Reiniciar, Tela Cheia) -->
+    <div class="flex items-center gap-2.5">
+      <button id="mute-btn" type="button" title="Áudio ativo (Toque para silenciar)"
+        class="flex items-center justify-center w-11 h-11 rounded-xl bg-slate-900/80 border border-slate-700/70 text-slate-200 hover:bg-slate-800 active:scale-95 transition">
+        <svg id="mute-icon-on" class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+        </svg>
+        <svg id="mute-icon-off" class="w-5 h-5 text-rose-400 hidden" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+        </svg>
+      </button>
+
+      <button id="reset-btn" type="button" title="Reiniciar conversa"
+        class="flex items-center gap-2 px-3.5 h-11 rounded-xl bg-slate-900/80 border border-slate-700/70 text-slate-200 hover:bg-slate-800 active:scale-95 transition text-xs md:text-sm font-medium">
+        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span class="hidden sm:inline">Nova Sessão</span>
+      </button>
+
+      <button id="fullscreen-btn" type="button" title="Alternar Tela Cheia (Modo Kiosk)"
+        class="flex items-center justify-center w-11 h-11 rounded-xl bg-slate-900/80 border border-slate-700/70 text-slate-200 hover:bg-slate-800 active:scale-95 transition">
+        <svg class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- =======================================================================
+       ÁREA PRINCIPAL DO TOTEM (AVATAR + FALA ATUAL + HISTÓRICO COMPACTO)
+       ======================================================================= -->
+  <main
+    class="relative z-10 flex-1 flex flex-col lg:flex-row items-center justify-between gap-4 px-5 py-3 md:px-10 md:py-5 overflow-hidden max-w-7xl w-full mx-auto">
+
+    <!-- Coluna Central / Esquerda: Palco do Avatar Bloub + Legenda Principal -->
+    <section class="flex-1 flex flex-col items-center justify-center w-full h-full min-h-0">
+
+      <!-- Stage Reativo do Avatar SVG (de test.txt) -->
+      <div id="avatar-stage" class="avatar-stage my-auto" data-state="idle">
+        <div class="avatar-aura"></div>
+        <div class="avatar-ring"></div>
+        <div class="avatar-ring-outer"></div>
+
+        <!-- SVG Oficial da Personagem Bloub (test.txt) -->
+        <svg id="bloub-svg" width="250" height="250" viewBox="-125 -125 250 250" role="img"
+          aria-label="Animated bloub avatar" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <mask id="bot-mask-3kdecj" maskUnits="userSpaceOnUse" x="-158" y="-158" width="316" height="316">
+              <path id="bloub-mask-body"
+                d="M99.46 -0.6C99.46 2.68 99.3 5.98 98.98 9.24C98.66 12.51 98.18 15.77 97.54 18.99C96.9 22.2 96.1 25.4 95.16 28.54C94.21 31.68 93.1 34.79 91.85 37.82C90.6 40.85 89.19 43.83 87.65 46.72C86.11 49.62 84.42 52.45 82.61 55.17C80.79 57.9 78.84 60.55 76.76 63.09C74.69 65.62 72.48 68.07 70.17 70.39C67.86 72.71 65.43 74.92 62.9 77C60.38 79.08 57.74 81.05 55.02 82.87C52.3 84.69 49.48 86.39 46.6 87.94C43.72 89.48 40.75 90.89 37.73 92.15C34.71 93.4 31.62 94.51 28.49 95.47C25.36 96.42 22.18 97.22 18.97 97.86C15.77 98.5 12.52 98.98 9.26 99.31C6.01 99.63 2.73 99.79 -0.54 99.79C-3.81 99.79 -7.09 99.63 -10.34 99.31C-13.59 98.98 -16.84 98.5 -20.05 97.86C-23.25 97.22 -26.44 96.42 -29.57 95.47C-32.69 94.51 -35.79 93.4 -38.81 92.15C-41.82 90.89 -44.8 89.48 -47.68 87.94C-50.56 86.39 -53.38 84.69 -56.1 82.87C-58.81 81.05 -61.45 79.08 -63.98 77C-66.5 74.92 -68.94 72.71 -71.25 70.39C-73.56 68.07 -75.77 65.62 -77.84 63.09C-79.91 60.55 -81.87 57.9 -83.68 55.17C-85.5 52.45 -87.19 49.62 -88.73 46.72C-90.27 43.83 -91.68 40.85 -92.93 37.82C-94.18 34.79 -95.28 31.68 -96.23 28.54C-97.18 25.4 -97.98 22.2 -98.62 18.99C-99.25 15.77 -99.74 12.51 -100.06 9.24C-100.38 5.98 -100.54 2.68 -100.54 -0.6C-100.54 -3.88 -100.38 -7.17 -100.06 -10.44C-99.74 -13.7 -99.25 -16.97 -98.62 -20.18C-97.98 -23.4 -97.18 -26.6 -96.23 -29.74C-95.28 -32.88 -94.18 -35.99 -92.93 -39.02C-91.68 -42.05 -90.27 -45.03 -88.73 -47.92C-87.19 -50.81 -85.5 -53.64 -83.68 -56.37C-81.87 -59.1 -79.91 -61.75 -77.84 -64.28C-75.77 -66.82 -73.56 -69.26 -71.25 -71.58C-68.94 -73.9 -66.5 -76.12 -63.98 -78.2C-61.45 -80.28 -58.81 -82.25 -56.1 -84.07C-53.38 -85.89 -50.56 -87.59 -47.68 -89.13C-44.8 -90.68 -41.82 -92.09 -38.81 -93.35C-35.79 -94.6 -32.69 -95.71 -29.57 -96.66C-26.44 -97.62 -23.25 -98.42 -20.05 -99.06C-16.84 -99.7 -13.59 -100.18 -10.34 -100.5C-7.09 -100.83 -3.81 -100.99 -0.54 -100.99C2.73 -100.99 6.01 -100.83 9.26 -100.5C12.52 -100.18 15.77 -99.7 18.97 -99.06C22.18 -98.42 25.36 -97.62 28.49 -96.66C31.62 -95.71 34.71 -94.6 37.73 -93.35C40.75 -92.09 43.72 -90.68 46.6 -89.13C49.48 -87.59 52.3 -85.89 55.02 -84.07C57.74 -82.25 60.38 -80.28 62.9 -78.2C65.43 -76.12 68.86 -73.9 70.17 -71.58C72.48 -69.26 74.69 -66.82 76.76 -64.28C78.84 -61.75 80.79 -59.1 82.61 -56.37C84.42 -53.64 86.11 -50.81 87.65 -47.92C89.19 -45.03 90.6 -42.05 91.85 -39.02C93.1 -35.99 94.21 -32.88 95.16 -29.74C96.1 -26.6 96.9 -23.4 97.54 -20.18C98.18 -16.97 98.66 -13.7 98.98 -10.44C99.3 -7.17 99.46 -3.88 99.46 -0.6Z"
+                fill="#fff" />
+              <path id="bloub-eye-left"
+                d="M-9.3 -11.3A9.3 9.3 0 0 1 0 -20.6L0 -20.6A9.3 9.3 0 0 1 9.3 -11.3L9.3 11.3A9.3 9.3 0 0 1 0 20.6L0 20.6A9.3 9.3 0 0 1 -9.3 11.3Z"
+                transform="matrix(0.89,-0.34,0.43,0.83,11.67,-45.56)" opacity="1" fill="#000" />
+              <path id="bloub-eye-right"
+                d="M-9.3 -11.3A9.3 9.3 0 0 1 0 -20.6L0 -20.6A9.3 9.3 0 0 1 9.3 -11.3L9.3 11.3A9.3 9.3 0 0 1 0 20.6L0 20.6A9.3 9.3 0 0 1 -9.3 11.3Z"
+                transform="matrix(0.7,-0.06,0.43,0.83,55.89,-56.47)" opacity="1" fill="#000" />
+            </mask>
+          </defs>
+          <g fill="none" stroke-linecap="round"></g>
+          <g opacity="1">
+            <path id="bloub-outer-body"
+              d="M99.46 -0.6C99.46 2.68 99.3 5.98 98.98 9.24C98.66 12.51 98.18 15.77 97.54 18.99C96.9 22.2 96.1 25.4 95.16 28.54C94.21 31.68 93.1 34.79 91.85 37.82C90.6 40.85 89.19 43.83 87.65 46.72C86.11 49.62 84.42 52.45 82.61 55.17C80.79 57.9 78.84 60.55 76.76 63.09C74.69 65.62 72.48 68.07 70.17 70.39C67.86 72.71 65.43 74.92 62.9 77C60.38 79.08 57.74 81.05 55.02 82.87C52.3 84.69 49.48 86.39 46.6 87.94C43.72 89.48 40.75 90.89 37.73 92.15C34.71 93.4 31.62 94.51 28.49 95.47C25.36 96.42 22.18 97.22 18.97 97.86C15.77 98.5 12.52 98.98 9.26 99.31C6.01 99.63 2.73 99.79 -0.54 99.79C-3.81 99.79 -7.09 99.63 -10.34 99.31C-13.59 98.98 -16.84 98.5 -20.05 97.86C-23.25 97.22 -26.44 96.42 -29.57 95.47C-32.69 94.51 -35.79 93.4 -38.81 92.15C-41.82 90.89 -44.8 89.48 -47.68 87.94C-50.56 86.39 -53.38 84.69 -56.1 82.87C-58.81 81.05 -61.45 79.08 -63.98 77C-66.5 74.92 -68.94 72.71 -71.25 70.39C-73.56 68.07 -75.77 65.62 -77.84 63.09C-79.91 60.55 -81.87 57.9 -83.68 55.17C-85.5 52.45 -87.19 49.62 -88.73 46.72C-90.27 43.83 -91.68 40.85 -92.93 37.82C-94.18 34.79 -95.28 31.68 -96.23 28.54C-97.18 25.4 -97.98 22.2 -98.62 18.99C-99.25 15.77 -99.74 12.51 -100.06 9.24C-100.38 5.98 -100.54 2.68 -100.54 -0.6C-100.54 -3.88 -100.38 -7.17 -100.06 -10.44C-99.74 -13.7 -99.25 -16.97 -98.62 -20.18C-97.98 -23.4 -97.18 -26.6 -96.23 -29.74C-95.28 -32.88 -94.18 -35.99 -92.93 -39.02C-91.68 -42.05 -90.27 -45.03 -88.73 -47.92C-87.19 -50.81 -85.5 -53.64 -83.68 -56.37C-81.87 -59.1 -79.91 -61.75 -77.84 -64.28C-75.77 -66.82 -73.56 -69.26 -71.25 -71.58C-68.94 -73.9 -66.5 -76.12 -63.98 -78.2C-61.45 -80.28 -58.81 -82.25 -56.1 -84.07C-53.38 -85.89 -50.56 -87.59 -47.68 -89.13C-44.8 -90.68 -41.82 -92.09 -38.81 -93.35C-35.79 -94.6 -32.69 -95.71 -29.57 -96.66C-26.44 -97.62 -23.25 -98.42 -20.05 -99.06C-16.84 -99.7 -13.59 -100.18 -10.34 -100.5C-7.09 -100.83 -3.81 -100.99 -0.54 -100.99C2.73 -100.99 6.01 -100.83 9.26 -100.5C12.52 -100.18 15.77 -99.7 18.97 -99.06C22.18 -98.42 25.36 -97.62 28.49 -96.66C31.62 -95.71 34.71 -94.6 37.73 -93.35C40.75 -92.09 43.72 -90.68 46.6 -89.13C49.48 -87.59 52.3 -85.89 55.02 -84.07C57.74 -82.25 60.38 -80.28 62.9 -78.2C65.43 -76.12 67.86 -73.9 70.17 -71.58C72.48 -69.26 74.69 -66.82 76.76 -64.28C78.84 -61.75 80.79 -59.1 82.61 -56.37C84.42 -53.64 86.11 -50.81 87.65 -47.92C89.19 -45.03 90.6 -42.05 91.85 -39.02C93.1 -35.99 94.21 -32.88 95.16 -29.74C96.1 -26.6 96.9 -23.4 97.54 -20.18C98.18 -16.97 98.66 -13.7 98.98 -10.44C99.3 -7.17 99.46 -3.88 99.46 -0.6Z"
+              fill="#f9f9f9" />
+            <g mask="url(#bot-mask-3kdecj)">
+              <rect id="bloub-eye-glow" x="-158" y="-158" width="316" height="316" fill="#0a0a0c" />
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Equalizador de Onda Sonora Sutil -->
+      <div id="soundwave-container" class="soundwave-container my-2" aria-hidden="true">
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+        <div class="soundwave-bar"></div>
+      </div>
+
+      <!-- Balão Principal de Fala do Bloub (Alta Legibilidade para Tablet/Totem) -->
+      <div
+        class="w-full max-w-2xl mt-2 rounded-3xl bg-slate-900/80 border border-white/10 px-6 py-5 md:px-8 md:py-6 shadow-2xl backdrop-blur-xl text-center">
+        <p id="bloub-speech-bubble"
+          class="text-lg md:text-2xl font-semibold text-slate-100 leading-relaxed selectable-text">
+          Olá! Eu sou o Bloub, seu assistente virtual aqui no totem. Como posso ajudar você hoje?
+        </p>
+      </div>
+    </section>
+
+    <!-- Coluna Lateral (em telas largas) / Painel de Histórico Recente -->
+    <aside
+      class="hidden lg:flex flex-col w-96 h-full max-h-[520px] rounded-3xl bg-slate-900/55 border border-white/10 backdrop-blur-xl overflow-hidden shadow-xl">
+      <div class="px-5 py-3.5 border-b border-white/10 flex items-center justify-between">
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Histórico da Conversa</span>
+        <span class="text-[11px] text-indigo-400 font-medium">Llama 3.3 70B</span>
+      </div>
+      <div id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar"></div>
+    </aside>
+  </main>
+
+  <!-- =======================================================================
+       RODAPÉ DE INTERAÇÃO (SUGESTÕES RÁPIDAS + MICROFONE + TEXTO)
+       ======================================================================= -->
+  <footer class="relative z-10 w-full max-w-5xl mx-auto px-4 pb-5 pt-2 md:px-8 md:pb-7">
+
+    <!-- Sugestões Rápidas para Toque no Tablet -->
+    <div class="flex items-center justify-center gap-2.5 overflow-x-auto pb-3 no-scrollbar">
+      <button type="button" data-prompt="Olá Bloub! Quem é você e como pode me ajudar?"
+        class="quick-prompt-btn shrink-0 rounded-full bg-slate-900/90 hover:bg-indigo-950/80 border border-slate-700/80 hover:border-indigo-400/60 px-4 py-2 text-xs md:text-sm font-medium text-slate-200 transition active:scale-95">
+        👋 Quem é você?
+      </button>
+      <button type="button"
+        data-prompt="Me conte uma curiosidade fascinante sobre tecnologia ou inteligência artificial!"
+        class="quick-prompt-btn shrink-0 rounded-full bg-slate-900/90 hover:bg-indigo-950/80 border border-slate-700/80 hover:border-indigo-400/60 px-4 py-2 text-xs md:text-sm font-medium text-slate-200 transition active:scale-95">
+        ✨ Conte uma curiosidade
+      </button>
+      <button type="button" data-prompt="Quais dicas você dá para aproveitar melhor o meu dia hoje?"
+        class="quick-prompt-btn shrink-0 rounded-full bg-slate-900/90 hover:bg-indigo-950/80 border border-slate-700/80 hover:border-indigo-400/60 px-4 py-2 text-xs md:text-sm font-medium text-slate-200 transition active:scale-95">
+        🚀 Dica do dia
+      </button>
+      <button type="button" data-prompt="Conte uma piada curta e inteligente para animar o ambiente!"
+        class="quick-prompt-btn shrink-0 rounded-full bg-slate-900/90 hover:bg-indigo-950/80 border border-slate-700/80 hover:border-indigo-400/60 px-4 py-2 text-xs md:text-sm font-medium text-slate-200 transition active:scale-95">
+        😄 Conte uma piada
+      </button>
+    </div>
+
+    <!-- Barra Principal: Botão Microfone (STT) + Input de Texto + Botão Enviar -->
+    <div class="flex items-center gap-3 md:gap-4">
+      <!-- Botão Grande de Microfone para Tablet -->
+      <button id="mic-btn" type="button" title="Toque para falar com o Bloub"
+        class="flex items-center justify-center gap-2.5 h-14 md:h-16 px-5 md:px-6 rounded-2xl bg-slate-800/90 border border-emerald-500/40 text-emerald-400 font-bold text-base md:text-lg shadow-lg transition-all duration-200 active:scale-95 hover:bg-slate-800 shrink-0">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+        </svg>
+        <span id="mic-btn-label" class="hidden sm:inline">Falar</span>
+      </button>
+
+      <!-- Formulário de Entrada de Texto -->
+      <form id="chat-form" class="flex-1 flex items-center gap-3">
+        <div class="relative flex-1">
+          <input id="chat-input" type="text" autocomplete="off"
+            placeholder="Toque para digitar ou use o microfone ao lado..."
+            class="w-full h-14 md:h-16 rounded-2xl bg-slate-900/90 border border-slate-700/90 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/30 px-5 text-base md:text-lg text-white placeholder-slate-400 outline-none transition shadow-inner" />
+        </div>
+
+        <button id="send-btn" type="submit"
+          class="flex items-center justify-center gap-2 h-14 md:h-16 px-6 md:px-8 rounded-2xl bg-gradient-to-r from-indigo-500 to-sky-500 hover:from-indigo-600 hover:to-sky-600 text-white font-bold text-base md:text-lg shadow-lg shadow-indigo-500/25 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none shrink-0">
+          <span>Enviar</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+          </svg>
+        </button>
+      </form>
+    </div>
+  </footer>
+
+  <!-- Scripts Modulares da Aplicação -->
+  <script src="/js/avatar.js"></script>
+  <script src="/js/speech.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+
+</html>

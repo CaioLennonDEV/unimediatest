@@ -1,0 +1,30 @@
+{
+  "name": "bloub-kiosk-ai",
+  "version": "1.0.0",
+  "description": "Totem/Kiosk Interativo com Assistente Virtual IA (Bloub) usando Groq API e Web Speech API",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build": "echo \"Build concluído - arquivos estáticos prontos em /public\""
+  },
+  "keywords": [
+    "kiosk",
+    "totem",
+    "ai-assistant",
+    "groq",
+    "web-speech-api",
+    "bloub"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "groq-sdk": "^0.7.0"
+  }
+}
