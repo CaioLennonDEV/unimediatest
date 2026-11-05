@@ -145,6 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
     speech.toggleManualListening();
   }
 
+  // Previne arrastar elementos ou gestos acidentais do navegador no tablet
+  window.addEventListener('dragstart', (e) => e.preventDefault());
+  window.addEventListener('drop', (e) => e.preventDefault());
+
   if (kioskScreen) {
     kioskScreen.addEventListener('click', handleScreenTouch);
     kioskScreen.addEventListener('touchstart', (e) => {
